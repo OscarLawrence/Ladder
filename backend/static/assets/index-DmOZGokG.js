@@ -1,4 +1,4 @@
-(function(){const t=document.createElement("link").relList;if(t&&t.supports&&t.supports("modulepreload"))return;for(const e of document.querySelectorAll('link[rel="modulepreload"]'))l(e);new MutationObserver(e=>{for(const a of e)if(a.type==="childList")for(const n of a.addedNodes)n.tagName==="LINK"&&n.rel==="modulepreload"&&l(n)}).observe(document,{childList:!0,subtree:!0});function r(e){const a={};return e.integrity&&(a.integrity=e.integrity),e.referrerPolicy&&(a.referrerPolicy=e.referrerPolicy),e.crossOrigin==="use-credentials"?a.credentials="include":e.crossOrigin==="anonymous"?a.credentials="omit":a.credentials="same-origin",a}function l(e){if(e.ep)return;e.ep=!0;const a=r(e);fetch(e.href,a)}})();class p{apiUrl="http://localhost:8000";constructor(){this.initializeUI(),this.loadSampleYields(),this.setupIncomeStream()}initializeUI(){document.querySelector("#app").innerHTML=`
+(function(){const t=document.createElement("link").relList;if(t&&t.supports&&t.supports("modulepreload"))return;for(const e of document.querySelectorAll('link[rel="modulepreload"]'))i(e);new MutationObserver(e=>{for(const a of e)if(a.type==="childList")for(const n of a.addedNodes)n.tagName==="LINK"&&n.rel==="modulepreload"&&i(n)}).observe(document,{childList:!0,subtree:!0});function r(e){const a={};return e.integrity&&(a.integrity=e.integrity),e.referrerPolicy&&(a.referrerPolicy=e.referrerPolicy),e.crossOrigin==="use-credentials"?a.credentials="include":e.crossOrigin==="anonymous"?a.credentials="omit":a.credentials="same-origin",a}function i(e){if(e.ep)return;e.ep=!0;const a=r(e);fetch(e.href,a)}})();class p{apiUrl=window.location.origin.includes("localhost:3000")?"http://localhost:8000":window.location.origin;constructor(){this.initializeUI(),this.loadSampleYields(),this.setupIncomeStream()}initializeUI(){document.querySelector("#app").innerHTML=`
       <div class="container">
         <h1>TIPS Bond Ladder Calculator</h1>
 
@@ -62,12 +62,12 @@
 
         <div id="error" class="error" style="display: none;"></div>
       </div>
-    `,this.attachEventListeners()}attachEventListeners(){document.getElementById("calculate-btn").addEventListener("click",()=>this.calculateLadder()),document.getElementById("time-horizon").addEventListener("change",()=>this.updateIncomeStreamLength())}setupIncomeStream(){const t=parseInt(document.getElementById("time-horizon").value);this.renderIncomeStream(t)}updateIncomeStreamLength(){const t=parseInt(document.getElementById("time-horizon").value);this.renderIncomeStream(t)}renderIncomeStream(t){const r=document.getElementById("income-stream-container"),l=parseInt(document.getElementById("current-age").value),e=parseInt(document.getElementById("current-year").value),a=r.querySelectorAll('[id^="income-year-"]'),n={};a.forEach((s,i)=>{n[i]=s.value});const d=Array(t).fill(0).map((s,i)=>{const m=l+i,o=e+i,c=n[i]||"10";return`
+    `,this.attachEventListeners()}attachEventListeners(){document.getElementById("calculate-btn").addEventListener("click",()=>this.calculateLadder()),document.getElementById("time-horizon").addEventListener("change",()=>this.updateIncomeStreamLength())}setupIncomeStream(){const t=parseInt(document.getElementById("time-horizon").value);this.renderIncomeStream(t)}updateIncomeStreamLength(){const t=parseInt(document.getElementById("time-horizon").value);this.renderIncomeStream(t)}renderIncomeStream(t){const r=document.getElementById("income-stream-container"),i=parseInt(document.getElementById("current-age").value),e=parseInt(document.getElementById("current-year").value),a=r.querySelectorAll('[id^="income-year-"]'),n={};a.forEach((s,o)=>{n[o]=s.value});const d=Array(t).fill(0).map((s,o)=>{const m=i+o,l=e+o,c=n[o]||"10";return`
         <div class="income-row">
-          <label>Year ${o} (Age ${m}):</label>
+          <label>Year ${l} (Age ${m}):</label>
           <div class="income-input-group">
             <span>$</span>
-            <input type="number" id="income-year-${i}" value="${c}" min="0" step="0.01">
+            <input type="number" id="income-year-${o}" value="${c}" min="0" step="0.01">
             <span>K</span>
           </div>
         </div>
@@ -76,13 +76,13 @@
       <div class="income-grid">
         ${d}
       </div>
-    `}async loadSampleYields(){try{const r=await(await fetch(`${this.apiUrl}/sample-yields`)).json();this.displayYields(r)}catch(t){console.error("Failed to load sample yields:",t)}}displayYields(t){const r=document.getElementById("yields-container"),l=t.map((e,a)=>`
+    `}async loadSampleYields(){try{const r=await(await fetch(`${this.apiUrl}/sample-yields`)).json();this.displayYields(r)}catch(t){console.error("Failed to load sample yields:",t)}}displayYields(t){const r=document.getElementById("yields-container"),i=t.map((e,a)=>`
       <div class="yield-row">
         <label>Maturity ${e.maturity_years} years:</label>
         <input type="number" id="yield-${a}" value="${(e.yield_rate*100).toFixed(3)}" step="0.001" min="0" max="10">
         <span>%</span>
       </div>
-    `).join("");r.innerHTML=l}collectFormData(){const t=parseInt(document.getElementById("current-age").value),r=parseInt(document.getElementById("time-horizon").value),l=parseInt(document.getElementById("current-year").value),e=parseInt(document.getElementById("current-month").value),a=parseFloat(document.getElementById("inflation-rate").value)/100,n=parseFloat(document.getElementById("tax-rate").value)/100,d=document.querySelectorAll('[id^="income-year-"]'),s=Array.from(d).map(o=>parseFloat(o.value)||0),i=[];return document.querySelectorAll('[id^="yield-"]').forEach((o,c)=>{const y=parseFloat(o.value)/100;i.push({maturity_years:.5+c*1,yield_rate:y})}),{current_age:t,time_horizon:r,current_year:l,current_month:e,start_year:l,start_month:e,target_income_stream:s,inflation_rate:a,tax_rate:n,tips_yields:i}}async calculateLadder(){const t=document.getElementById("loading"),r=document.getElementById("error"),l=document.getElementById("results-section");try{t.style.display="block",r.style.display="none",l.style.display="none";const e=this.collectFormData(),a=await fetch(`${this.apiUrl}/calculate-ladder`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(e)});if(!a.ok)throw new Error(`HTTP error! status: ${a.status}`);const n=await a.json();this.displayResults(n)}catch(e){r.textContent=`Error: ${e instanceof Error?e.message:"Unknown error"}`,r.style.display="block"}finally{t.style.display="none"}}displayResults(t){const r=document.getElementById("summary-stats"),l=document.getElementById("results-table"),e=document.getElementById("results-section");r.innerHTML=`
+    `).join("");r.innerHTML=i}collectFormData(){const t=parseInt(document.getElementById("current-age").value),r=parseInt(document.getElementById("time-horizon").value),i=parseInt(document.getElementById("current-year").value),e=parseInt(document.getElementById("current-month").value),a=parseFloat(document.getElementById("inflation-rate").value)/100,n=parseFloat(document.getElementById("tax-rate").value)/100,d=document.querySelectorAll('[id^="income-year-"]'),s=Array.from(d).map(l=>parseFloat(l.value)||0),o=[];return document.querySelectorAll('[id^="yield-"]').forEach((l,c)=>{const y=parseFloat(l.value)/100;o.push({maturity_years:.5+c*1,yield_rate:y})}),{current_age:t,time_horizon:r,current_year:i,current_month:e,start_year:i,start_month:e,target_income_stream:s,inflation_rate:a,tax_rate:n,tips_yields:o}}async calculateLadder(){const t=document.getElementById("loading"),r=document.getElementById("error"),i=document.getElementById("results-section");try{t.style.display="block",r.style.display="none",i.style.display="none";const e=this.collectFormData(),a=await fetch(`${this.apiUrl}/calculate-ladder`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(e)});if(!a.ok)throw new Error(`HTTP error! status: ${a.status}`);const n=await a.json();this.displayResults(n)}catch(e){r.textContent=`Error: ${e instanceof Error?e.message:"Unknown error"}`,r.style.display="block"}finally{t.style.display="none"}}displayResults(t){const r=document.getElementById("summary-stats"),i=document.getElementById("results-table"),e=document.getElementById("results-section");r.innerHTML=`
       <div class="summary-grid">
         <div class="summary-item">
           <label>Total Investment Required:</label>
@@ -124,4 +124,4 @@
           `).join("")}
         </tbody>
       </table>
-    `;l.innerHTML=a,e.style.display="block"}}new p;
+    `;i.innerHTML=a,e.style.display="block"}}new p;
