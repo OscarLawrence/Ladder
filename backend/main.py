@@ -19,6 +19,9 @@ app.add_middleware(
 
 # Serve static files (built frontend)
 if os.path.exists("static"):
+    # Mount assets and other static files at root level
+    app.mount("/assets", StaticFiles(directory="static/assets"), name="assets")
+    # Mount other static files like vite.svg
     app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
@@ -32,6 +35,12 @@ def read_root():
 @app.get("/api")
 def api_info():
     return {"message": "TIPS Ladder Calculator API", "version": "1.0.0"}
+
+@app.get("/vite.svg")
+def vite_svg():
+    if os.path.exists("static/vite.svg"):
+        return FileResponse("static/vite.svg")
+    return {"error": "File not found"}
 
 
 @app.post("/calculate-ladder", response_model=LadderResult)
