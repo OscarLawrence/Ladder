@@ -1,0 +1,16 @@
+
+
+The object is to build a fixed income ladder out of tips bonds that generates a certain amount of after tax real income in a given year
+
+See Ladder Clean Example 2025 09 v03.xlsx for the math steps involved
+
+- Column S 'real post tax income at time t (today's dollars)' contains after tax real income in a given year.
+- Column D 'i(R,G) income stream (real, pretax/Gross)' contains the inputs. They are adjusted iteratively to generate the target values in column S
+- In the example, these are set to 10 but those are variables set by the user
+- The remaining columns are mostly intermediate steps and should be self-explanatory from the formula and the column header. If not, please ask questions
+- The current age (B5) should also be an input variable. Same with the time horizon (40 years in the spreadsheet but the user should eb able to chose)
+- current year / month and start year month should also be input variables
+
+
+The numbers in column E represent real interest rates read off here: https://www.wsj.com/market-data/bonds/tips (the column labeled 'yield')
+Ideally we'd have a separate tool that generates column E from the information on that page 
